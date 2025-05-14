@@ -42,7 +42,7 @@ echo ""
 # Install Node.js dependencies for backend
 echo -e "${YELLOW}Installing backend dependencies...${NC}"
 cd /workspace/Medusa-Bikeshop-Shipment/bikeshop-shipment
-npm install
+npm install --legacy-peer-deps
 if [ $? -eq 0 ]; then
   echo -e "  ${GREEN}Backend dependencies installed successfully.${NC}"
 else
@@ -54,7 +54,7 @@ echo ""
 # Install Node.js dependencies for frontend
 echo -e "${YELLOW}Installing frontend dependencies...${NC}"
 cd /workspace/Medusa-Bikeshop-Shipment/bikeshop-shipment-storefront
-npm install
+npm install --legacy-peer-deps
 if [ $? -eq 0 ]; then
   echo -e "  ${GREEN}Frontend dependencies installed successfully.${NC}"
 else
