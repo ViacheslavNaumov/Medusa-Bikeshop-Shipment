@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: medusa-bikeshop-shipment
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  bikeshop:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "12000:12000"
+      - "12001:12001"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres/medusa-bikeshop-shipment
+      STRIPE_API_KEY: sk_test_example
+      STRIPE_WEBHOOK_SECRET: whsec_example
+      JWT_SECRET: supersecret
+      COOKIE_SECRET: supersecret
+      STORE_CORS: http://localhost:8000,http://localhost:12001
+      ADMIN_CORS: http://localhost:5173,http://localhost:9000,http://localhost:12000
+      AUTH_CORS: http://localhost:5173,http://localhost:9000,http://localhost:8000,http://localhost:12000,http://localhost:12001
+      PORT: 12000
+      NEXT_PUBLIC_MEDUSA_BACKEND_URL: http://localhost:12000
+      NEXT_PUBLIC_BASE_URL: http://localhost:12001
+      REVALIDATE_SECRET: supersecret
+      NEXT_PUBLIC_ALLOW_IFRAME: "true"
+      NEXT_PUBLIC_ALLOW_CORS: "true"
+
+volumes:
+  postgres_data:
