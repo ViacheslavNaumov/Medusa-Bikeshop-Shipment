@@ -1,11 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useAccount } from "@/lib/context/account-context"
-import { Spinner } from "@medusajs/ui"
-import { Button } from "@/components/common/button"
+import { Button } from "@medusajs/ui"
 import Link from "next/link"
 import { ArrowLeft } from "@medusajs/icons"
+import { getCustomer } from "@lib/data/customer"
 
 interface Shipment {
   id: string
@@ -22,17 +21,26 @@ interface Shipment {
 }
 
 export default function ShipmentDetails({ id }: { id: string }) {
-  const { customer, isLoading: isLoadingCustomer } = useAccount()
+  const [customer, setCustomer] = useState(null)
   const [shipment, setShipment] = useState<Shipment | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchShipment = async () => {
-      if (!customer) return
-
+    const fetchCustomerAndShipment = async () => {
       try {
         setIsLoading(true)
+        
+        // Get customer
+        const customerResponse = await getCustomer()
+        setCustomer(customerResponse)
+        
+        if (!customerResponse) {
+          setIsLoading(false)
+          return
+        }
+
+        // Fetch shipment
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL}/store/shipments/${id}`,
           {
@@ -47,22 +55,20 @@ export default function ShipmentDetails({ id }: { id: string }) {
         const data = await response.json()
         setShipment(data.shipment || null)
       } catch (err) {
-        console.error("Error fetching shipment:", err)
+        console.error("Error fetching data:", err)
         setError("Failed to load shipment details. Please try again later.")
       } finally {
         setIsLoading(false)
       }
     }
 
-    if (customer) {
-      fetchShipment()
-    }
-  }, [customer, id])
+    fetchCustomerAndShipment()
+  }, [id])
 
-  if (isLoadingCustomer || isLoading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center w-full h-40">
-        <Spinner />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
     )
   }

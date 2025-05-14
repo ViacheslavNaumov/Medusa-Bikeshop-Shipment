@@ -1,11 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useAccount } from "@/lib/context/account-context"
-import { Spinner } from "@medusajs/ui"
-import { Button } from "@/components/common/button"
+import { Button } from "@medusajs/ui"
 import Link from "next/link"
-import { medusaClient } from "@/lib/config"
+import { medusaClient } from "@lib/config"
+import { getCustomer } from "@lib/data/customer"
 
 interface Shipment {
   id: string
@@ -21,19 +20,28 @@ interface Shipment {
 }
 
 export default function ShipmentsList() {
-  const { customer, isLoading: isLoadingCustomer } = useAccount()
+  const [customer, setCustomer] = useState(null)
   const [shipments, setShipments] = useState<Shipment[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchShipments = async () => {
-      if (!customer) return
-
+    const fetchCustomerAndShipments = async () => {
       try {
         setIsLoading(true)
+        
+        // Get customer
+        const customerResponse = await getCustomer()
+        setCustomer(customerResponse)
+        
+        if (!customerResponse) {
+          setIsLoading(false)
+          return
+        }
+
+        // Fetch shipments
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL}/store/shipments?user_id=${customer.id}`,
+          `${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL}/store/shipments?user_id=${customerResponse.id}`,
           {
             credentials: "include",
           }
@@ -46,22 +54,20 @@ export default function ShipmentsList() {
         const data = await response.json()
         setShipments(data.shipments || [])
       } catch (err) {
-        console.error("Error fetching shipments:", err)
+        console.error("Error fetching data:", err)
         setError("Failed to load shipments. Please try again later.")
       } finally {
         setIsLoading(false)
       }
     }
 
-    if (customer) {
-      fetchShipments()
-    }
-  }, [customer])
+    fetchCustomerAndShipments()
+  }, [])
 
-  if (isLoadingCustomer || isLoading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center w-full h-40">
-        <Spinner />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
     )
   }

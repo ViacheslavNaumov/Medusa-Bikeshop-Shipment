@@ -1,6 +1,5 @@
 import { Metadata } from "next"
-import { getServerSideConfig } from "@/lib/data/config"
-import { getRegion } from "@/lib/data/region"
+import { getRegion } from "@lib/data/regions"
 import ShipmentDetails from "./shipment-details"
 
 type Props = {
@@ -13,7 +12,6 @@ export const metadata: Metadata = {
 }
 
 export default async function ShipmentDetailsPage({ params }: Props) {
-  const config = await getServerSideConfig()
   const region = await getRegion(params.countryCode)
 
   if (!region) {

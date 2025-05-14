@@ -44,15 +44,17 @@ export STRIPE_API_KEY=sk_test_example
 export STRIPE_WEBHOOK_SECRET=whsec_example
 export JWT_SECRET=supersecret
 export COOKIE_SECRET=supersecret
-export STORE_CORS=http://localhost:8000,http://localhost:12001,https://work-1-jafetlshqwpgxbpj.prod-runtime.all-hands.dev,https://work-2-jafetlshqwpgxbpj.prod-runtime.all-hands.dev
-export ADMIN_CORS=http://localhost:5173,http://localhost:9000,http://localhost:12000,https://work-1-jafetlshqwpgxbpj.prod-runtime.all-hands.dev,https://work-2-jafetlshqwpgxbpj.prod-runtime.all-hands.dev
-export AUTH_CORS=http://localhost:5173,http://localhost:9000,http://localhost:8000,http://localhost:12000,http://localhost:12001,https://work-1-jafetlshqwpgxbpj.prod-runtime.all-hands.dev,https://work-2-jafetlshqwpgxbpj.prod-runtime.all-hands.dev
+export STORE_CORS=http://localhost:8000,http://localhost:12001,https://work-1-jafetlshqwpgxbpj.prod-runtime.all-hands.dev,https://work-2-jafetlshqwpgxbpj.prod-runtime.all-hands.dev,https://app.all-hands.dev
+export ADMIN_CORS=http://localhost:5173,http://localhost:9000,http://localhost:12000,https://work-1-jafetlshqwpgxbpj.prod-runtime.all-hands.dev,https://work-2-jafetlshqwpgxbpj.prod-runtime.all-hands.dev,https://app.all-hands.dev
+export AUTH_CORS=http://localhost:5173,http://localhost:9000,http://localhost:8000,http://localhost:12000,http://localhost:12001,https://work-1-jafetlshqwpgxbpj.prod-runtime.all-hands.dev,https://work-2-jafetlshqwpgxbpj.prod-runtime.all-hands.dev,https://app.all-hands.dev
 export PORT=12000
+export MEDUSA_ADMIN_CORS=https://work-1-jafetlshqwpgxbpj.prod-runtime.all-hands.dev,https://app.all-hands.dev
+export MEDUSA_ADMIN_BACKEND_URL=https://work-1-jafetlshqwpgxbpj.prod-runtime.all-hands.dev
 
 # Run migrations
 echo "Running database migrations..."
 npx medusa migrations run
 
 # Start Medusa server
-echo "Starting Medusa server..."
-npx medusa develop --host 0.0.0.0
+echo "Starting Medusa server on port $PORT..."
+npx medusa develop --port $PORT --host 0.0.0.0
