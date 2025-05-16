@@ -1,8 +1,8 @@
 import { HttpTypes } from "@medusajs/types"
 import { NextRequest, NextResponse } from "next/server"
 
-const BACKEND_URL = process.env.MEDUSA_BACKEND_URL
-const PUBLISHABLE_API_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
+const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
+const PUBLISHABLE_API_KEY = process.env.PUBLISHABLE_API_KEY
 const DEFAULT_REGION = process.env.NEXT_PUBLIC_DEFAULT_REGION || "us"
 
 const regionMapCache = {
@@ -15,8 +15,23 @@ async function getRegionMap(cacheId: string) {
 
   if (!BACKEND_URL) {
     throw new Error(
-      "Middleware.ts: Error fetching regions. Did you set up regions in your Medusa Admin and define a MEDUSA_BACKEND_URL environment variable? Note that the variable is no longer named NEXT_PUBLIC_MEDUSA_BACKEND_URL."
+      "Middleware.ts: Error fetching regions. Did you set up regions in your Medusa Admin and define a NEXT_PUBLIC_MEDUSA_BACKEND_URL environment variable."
     )
+  }
+
+  // For development, let's create a mock region map
+  if (process.env.NODE_ENV === "development") {
+    const mockRegion = {
+      id: "reg_us",
+      name: "United States",
+      currency_code: "usd",
+      countries: [{ iso_2: "us", display_name: "United States" }],
+    } as HttpTypes.StoreRegion;
+    
+    regionMapCache.regionMap.set("us", mockRegion);
+    regionMapCache.regionMapUpdated = Date.now();
+    
+    return regionMapCache.regionMap;
   }
 
   if (
@@ -26,7 +41,7 @@ async function getRegionMap(cacheId: string) {
     // Fetch regions from Medusa. We can't use the JS client here because middleware is running on Edge and the client needs a Node environment.
     const { regions } = await fetch(`${BACKEND_URL}/store/regions`, {
       headers: {
-        "x-publishable-api-key": PUBLISHABLE_API_KEY!,
+        ...(PUBLISHABLE_API_KEY && { "x-publishable-api-key": PUBLISHABLE_API_KEY }),
       },
       next: {
         revalidate: 3600,

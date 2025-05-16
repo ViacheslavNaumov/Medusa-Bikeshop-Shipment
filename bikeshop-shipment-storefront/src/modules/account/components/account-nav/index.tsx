@@ -89,6 +89,22 @@ const AccountNav = ({
                   </LocalizedClientLink>
                 </li>
                 <li>
+                  <LocalizedClientLink
+                    href="/account/payment-methods"
+                    className="flex items-center justify-between py-4 border-b border-gray-200 px-8"
+                    data-testid="payment-methods-link"
+                  >
+                    <div className="flex items-center gap-x-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                        <line x1="1" y1="10" x2="23" y2="10"></line>
+                      </svg>
+                      <span>Payment Methods</span>
+                    </div>
+                    <ChevronDown className="transform -rotate-90" />
+                  </LocalizedClientLink>
+                </li>
+                <li>
                   <button
                     type="button"
                     className="flex items-center justify-between py-4 border-b border-gray-200 px-8 w-full"
@@ -148,6 +164,15 @@ const AccountNav = ({
                   data-testid="orders-link"
                 >
                   Orders
+                </AccountNavLink>
+              </li>
+              <li>
+                <AccountNavLink
+                  href="/account/payment-methods"
+                  route={route!}
+                  data-testid="payment-methods-link"
+                >
+                  Payment Methods
                 </AccountNavLink>
               </li>
               <li className="text-grey-700">
